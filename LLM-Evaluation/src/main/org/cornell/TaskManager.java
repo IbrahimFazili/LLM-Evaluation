@@ -51,4 +51,14 @@ public class TaskManager {
         tasks.remove(task);
         tasks.add(position, task);
     }
+
+    public List<Task> getTasksOwnedBy(String owner) {
+        List<Task> rlTask = new ArrayList<>();
+        for (Task t: tasks) {
+            if (t.getOwner().equals(owner)) {
+                rlTask.add(t);
+            }
+        }
+        return rlTask;
+    }
 }
