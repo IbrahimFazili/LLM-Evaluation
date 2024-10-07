@@ -34,9 +34,26 @@ class Math:
         
     @staticmethod
     def naturallog(number):
-        # source https://stackoverflow.com/questions/13211137/get-logarithm-without-math-log-python
-        n = 1000000.0 # for precision
-        return n * ((number ** (1/n)) - 1)
+        # source https://www.reddit.com/r/javahelp/comments/ybbu3k/can_we_find_natural_log_without_mathlog/
+        # example of code which is hard to translate
+        e = 2.718281828459045
+        epsilon=1e-10
+        low, high = 0, number
+        if number < 1:
+            high = 1
+
+        # Perform binary search
+        while high - low > epsilon:
+            mid = (low + high) / 2
+            exp_mid = e ** mid  # Calculate exp(mid)
+
+            # Adjust the bounds based on the comparison
+            if exp_mid < number:
+                low = mid  # Move the lower bound up
+            else:
+                high = mid  # Move the upper bound down
+
+        return (low + high) / 2
     
 
     @staticmethod

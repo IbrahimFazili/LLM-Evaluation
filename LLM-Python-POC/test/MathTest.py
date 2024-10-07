@@ -1,3 +1,4 @@
+import math
 import unittest
 import sys
 import os
@@ -35,7 +36,24 @@ class MathTest(unittest.TestCase):
         self.assertLessEqual(Math.abs(degreeTest - degree), Math.PRECISION)
 
     def test3(self):
-        pass
+        number = 5
+        nlog = Math.naturallog(number)
+        self.assertLessEqual(Math.abs(nlog - math.log(number)), Math.PRECISION)
+
+        ceiling = Math.ceil(nlog)
+        self.assertEqual(ceiling, 2)
+
+        p = Math.pow(ceiling, ceiling)
+        self.assertEqual(p, 4)
+
+        self.assertEqual(Math.min(number, p), p)
+        f = Math.factorial(5 * 2)
+        sqrt = Math.squareroot(f)
+
+        self.assertLessEqual(Math.abs(sqrt - math.sqrt(f)), Math.PRECISION)
+
+        p += 24 / 5
+        self.assertLessEqual(Math.abs(Math.toRadians(p) - math.radians(p)), Math.PRECISION)
 
 if __name__ == '__main__':
     unittest.main()

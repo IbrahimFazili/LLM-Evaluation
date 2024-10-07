@@ -31,3 +31,11 @@ class TaskManager:
             return
         self.tasks.remove(task)
         self.tasks.insert(position, task)
+
+    def getTasksOwnedBy(self, owner: str) -> list:
+        return [task for task in self.tasks if task.owner == owner]
+    
+    def changeOwner(self, owner: str, task: Task) -> None:
+        if task in self.tasks:
+            i = self.tasks.index(task)
+            self.tasks[i].owner = owner
