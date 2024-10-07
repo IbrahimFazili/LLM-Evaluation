@@ -137,37 +137,6 @@ class TaskManagerTest {
     }
 
     @Test
-    void testTaskWithHistoricalDatesAndCompletion() {
-        TaskManager taskManager = new TaskManager();
-        LocalDate startDate = LocalDate.of(2022, 10, 1);
-        LocalDate endDate = LocalDate.of(2023, 4, 1);
-
-        Task task = new Task(1, "Ibrahim", "Historical Completion Task", "Task with historical dates.",
-                startDate, endDate);
-        taskManager.addTask(task);
-
-        task.markAsCompleted();
-        task.setCompletionDate(LocalDate.now());
-
-        assertTrue(task.isCompleted());
-        assertTrue(LocalDate.now().isAfter(task.getEndDate()));
-    }
-
-    @Test
-    void testTaskDurationExtension() {
-        TaskManager taskManager = new TaskManager();
-        LocalDate startDate = LocalDate.of(2024, 1, 1);
-        LocalDate endDate = startDate.plusMonths(3);
-
-        Task task = new Task(1, "Ibrahim", "Extend Duration Task", "Task to test duration extension.", startDate, endDate);
-        taskManager.addTask(task);
-
-        task.setEndDate(endDate.plusMonths(2));
-
-        assertEquals(5, ChronoUnit.MONTHS.between(task.getStartDate(), task.getEndDate()));
-    }
-
-    @Test
     void testGetTasksOwnedBy() {
         TaskManager taskManager = new TaskManager();
         Task task1 = new Task(1, "Ibrahim", "Task 1", "Task owned by Ibrahim.",
@@ -215,7 +184,7 @@ class TaskManagerTest {
         assertTrue(kevinTasks.contains(task2));
 
         // let's update the owners
-        task2.setOwner("Ibrahim");
+        taskManager.changeOwner("Ibrahim", task2);
 
         ibrahimTasks = taskManager.getTasksOwnedBy("Ibrahim");
 

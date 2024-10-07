@@ -61,4 +61,11 @@ public class TaskManager {
         }
         return rlTask;
     }
+
+    public void changeOwner(String owner, Task task) {
+        if (tasks.contains(task)) {
+            int i = tasks.indexOf(task);
+            tasks.get(i).setOwner(owner);
+        }
+    }
 }
