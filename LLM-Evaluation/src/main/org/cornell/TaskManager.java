@@ -8,18 +8,15 @@ public class TaskManager {
 
     public void addTask(Task task) {
         tasks.add(task);
-        notifyObservers("Task added: " + task.getTitle());
     }
 
     public void removeTask(Task task) {
         tasks.remove(task);
-        notifyObservers("Task removed: " + task.getTitle());
     }
 
     public void markTaskAsCompleted(Task task) {
         if (tasks.contains(task)) {
             task.markAsCompleted();
-            notifyObservers("Task completed: " + task.getTitle());
         }
     }
 
@@ -47,9 +44,28 @@ public class TaskManager {
         return completedTasks;
     }
 
-    // Notify observers (for event handling)
-    private void notifyObservers(String message) {
-        // Implementation for notifying observers can go here
-        System.out.println(message);
+    public void shiftTaskAround(Task task, int position) {
+        if (position >= tasks.size() || !tasks.contains(task)){
+            return;
+        }
+        tasks.remove(task);
+        tasks.add(position, task);
+    }
+
+    public List<Task> getTasksOwnedBy(String owner) {
+        List<Task> rlTask = new ArrayList<>();
+        for (Task t: tasks) {
+            if (t.getOwner().equals(owner)) {
+                rlTask.add(t);
+            }
+        }
+        return rlTask;
+    }
+
+    public void changeOwner(String owner, Task task) {
+        if (tasks.contains(task)) {
+            int i = tasks.indexOf(task);
+            tasks.get(i).setOwner(owner);
+        }
     }
 }
