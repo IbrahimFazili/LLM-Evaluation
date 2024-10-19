@@ -30,4 +30,18 @@ Once this is done, you can activate the virtual environment with the following c
 
 And to test that it works, you run `graalpy TestGraal.py` and it should work on a small code.
 
+### Calling Java code in Python
+
+To do this, you first need to compile the java classes you want with the `javac` command. 
+
+Then you will need to add `import java` and `ClassNmae = java.type('packagename.ClassName')` to the top of the python file. 
+
+Once this is done, you will need to run the following command,
+`graalpy --jvm --vm.cp="/absolute/path/to/the/package/you/want" /absolute/path/to/the/python/file/to/run`
+
+So the following is an example you can copy to try and have an idea on how to do it
+![alt text](image-1.png) 
+
+Be warned, graalpy is very heavy and slow so don't be surprised if it takes more time than usual to execute the command
+
 The rest TBD
