@@ -44,4 +44,14 @@ So the following is an example you can copy to try and have an idea on how to do
 
 Be warned, graalpy is very heavy and slow so don't be surprised if it takes more time than usual to execute the command
 
+#### Calling classes that call one another
+
+As an example, to run the `TaskManagerTestJava` you will need to run compile it a little differently because it requires the `lombok` library:
+
+`javac -cp /Users/ibrahimfazili/.m2/repository/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar:. -processorpath /Users/ibrahimfazili/.m2/repository/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar Task.java TaskManager.java`
+
+Then you can run it like the following:
+
+`graalpy --jvm --vm.cp="/Users/ibrahimfazili/OneDrive - Cornell University/CS6158 Software Engineering in Machine Learning/LLM-Evaluation/LLM-Evaluation/src/main/" /Users/ibrahimfazili/OneDrive\ -\ Cornell\ University/CS6158\ Software\ Engineering\ in\ Machine\ Learning/LLM-Evaluation/LLM-Python-POC/test/TaskManagerTestJava.py`
+
 The rest TBD

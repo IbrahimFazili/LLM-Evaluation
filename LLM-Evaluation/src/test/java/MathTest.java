@@ -4,7 +4,7 @@ import static org.cornell.Math.*;
 
 public class MathTest {
     @Test
-    void test1() {
+    public void test1() {
         double base = 10;
         double exponent = 2;
 
@@ -22,7 +22,7 @@ public class MathTest {
     }
 
     @Test
-    void test2() {
+    public void test2() {
         double degree = 34;
         double radian = 0.593412;
 
@@ -34,7 +34,7 @@ public class MathTest {
     }
 
     @Test
-    void test3() {
+    public void test3() {
         double number = 5;
         double nlog = naturallog(number);
         assert abs(nlog - Math.log(number)) <= PRECISION;
