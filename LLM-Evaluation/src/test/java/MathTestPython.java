@@ -11,9 +11,9 @@ public class MathTestPython {
     private String pythonScript;
 
     public MathTestPython() throws IOException {
+        //adjust the path as needed
         pythonScript = new String(
-                Files.readAllBytes(Paths.get("/Users/ibrahimfazili/OneDrive - Cornell University/" +
-                        "CS6158 Software Engineering in Machine Learning/LLM-Evaluation/LLM-Python-POC/src/Math.py")));
+                Files.readAllBytes(Paths.get("/Users/kevincui/Desktop/FA 24/cs_6158/LLM-Evaluation/math1.py")));
     }
 
     @Test

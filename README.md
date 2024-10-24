@@ -26,7 +26,7 @@ for reference, this is what Ibrahim has downloaded (he's running on an M1 Mac)
 Once you have installed it, you can follow the steps here https://www.graalvm.org/latest/reference-manual/python/Python-Runtime/, specifically the alternative steps because you will be downloading it from Github releases.
 For the export path, you can use the following command `export PATH=~/graalpy-24.1.1-macos-aarch64/bin:$PATH` and change it to match whichever graalpy you have installed and wherever you have kept the extracted file.
 
-Once this is done, you can activate the virtual environment with the following command, `source graal-venv/bin/activate`
+Once this is done, you can activate the virtual environment with the following command, `source LLM-Python-POC/graal-venv/bin/activate`
 
 And to test that it works, you run `graalpy TestGraal.py` and it should work on a small code.
 
