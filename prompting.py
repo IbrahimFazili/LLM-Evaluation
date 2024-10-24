@@ -23,38 +23,76 @@ def send_to_llm(input_string, system_prompt):
     )
     return completion
 
+def gen_llm_output_java2python(input_path, output_path):
+    try:
+        # Open the file in read mode
+        with open(input_path, 'r') as file:
+            # Read the file content
+            java_code = file.read()
 
+        response = send_to_llm(java_code, SYSTEM_PROMPT)
+        response_output = response.choices[0].message.content
+        # print(response_output)
+        with open(output_path, 'w') as f:
+            print(response_output, file=f)
+    except Exception as e:
+        print(f'Error reading file: {e}')
 
-#simple example (source code)
-file_path = 'LLM-Evaluation/src/main/org/cornell/Math.java'
-try:
-    # Open the file in read mode
-    with open(file_path, 'r') as file:
-        # Read the file content
-        java_code = file.read()
+gen_llm_output_java2python('LLM-Evaluation/src/main/org/cornell/Task.java', 'task1.py')
+gen_llm_output_java2python('LLM-Evaluation/src/main/org/cornell/TaskManager.java', 'task_manager1.py')
+gen_llm_output_java2python('LLM-Evaluation/src/test/java/TaskManagerTest.java', 'task_manager_test1.py')
 
-    response = send_to_llm(java_code, SYSTEM_PROMPT)
-    response_output = response.choices[0].message.content
-    # print(response_output)
-    with open('math3.py', 'w') as f:
-        print(response_output, file=f)
-except Exception as e:
-    print(f'Error reading file: {e}')
-
-#simple example 2 (source code test)
-file_path_test = 'LLM-Evaluation/src/test/java/MathTest.java'
-try:
-    # Open the file in read mode
-    with open(file_path_test, 'r') as file:
-        # Read the file content
-        java_code = file.read()
-
-    response = send_to_llm(java_code, SYSTEM_PROMPT)
-    response_output = response.choices[0].message.content
-    # print(response_output)
-    with open('math_test.py', 'w') as f:
-        print(response_output, file=f)
-
-
-except Exception as e:
-    print(f'Error reading file: {e}')
+#
+#
+#
+# #simple example (source code)
+# file_path = 'LLM-Evaluation/src/main/org/cornell/Task.java'
+# try:
+#     # Open the file in read mode
+#     with open(file_path, 'r') as file:
+#         # Read the file content
+#         java_code = file.read()
+#
+#     response = send_to_llm(java_code, SYSTEM_PROMPT)
+#     response_output = response.choices[0].message.content
+#     # print(response_output)
+#     with open('task1.py', 'w') as f:
+#         print(response_output, file=f)
+# except Exception as e:
+#     print(f'Error reading file: {e}')
+#
+# #simple example 2 (source code test)
+# file_path = 'LLM-Evaluation/src/main/org/cornell/TaskManager.java'
+# try:
+#     # Open the file in read mode
+#     with open(file_path, 'r') as file:
+#         # Read the file content
+#         java_code = file.read()
+#
+#     response = send_to_llm(java_code, SYSTEM_PROMPT)
+#     response_output = response.choices[0].message.content
+#     # print(response_output)
+#     with open('task_manager1.py', 'w') as f:
+#         print(response_output, file=f)
+#
+#
+# except Exception as e:
+#     print(f'Error reading file: {e}')
+#
+# #simple example 3 (source code test)
+# file_path = 'LLM-Evaluation/src/test/java/TaskManagerTest.java'
+# try:
+#     # Open the file in read mode
+#     with open(file_path, 'r') as file:
+#         # Read the file content
+#         java_code = file.read()
+#
+#     response = send_to_llm(java_code, SYSTEM_PROMPT)
+#     response_output = response.choices[0].message.content
+#     # print(response_output)
+#     with open('task_manager_test1.py', 'w') as f:
+#         print(response_output, file=f)
+#
+#
+# except Exception as e:
+#     print(f'Error reading file: {e}')
