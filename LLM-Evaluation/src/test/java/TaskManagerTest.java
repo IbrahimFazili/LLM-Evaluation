@@ -1,5 +1,5 @@
-import org.cornell.Task;
-import org.cornell.TaskManager;
+import cornell.Task;
+import cornell.TaskManager;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

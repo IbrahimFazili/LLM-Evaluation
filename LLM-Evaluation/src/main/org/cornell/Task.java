@@ -1,4 +1,4 @@
-package org.cornell;
+package cornell;
 
 import java.time.LocalDate;
 import lombok.Getter;

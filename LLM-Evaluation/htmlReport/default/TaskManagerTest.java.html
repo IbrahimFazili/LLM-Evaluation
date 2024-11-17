@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TaskManagerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TaskManagerTest Coverage Results</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">TaskManagerTest.java</span></div><h1>TaskManagerTest.java</h1><pre class="source lang-java linenums">import org.cornell.Task;
+import org.cornell.TaskManager;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L11">class TaskManagerTest {</span>
+
+    // Complex Test 1: Add task with specific start and end dates, verify date manipulation
+    @Test
+    void testAddTaskWithDateManipulation() {
+<span class="fc" id="L16">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L17">        LocalDate startDate = LocalDate.of(2024, 10, 1); // Set specific start date</span>
+<span class="fc" id="L18">        LocalDate endDate = startDate.plus(30, ChronoUnit.DAYS).minusWeeks(1).plusDays(3); // Date manipulation</span>
+
+<span class="fc" id="L20">        Task task = new Task(1, &quot;Ibrahim&quot;, &quot;Complex Date Task&quot;, &quot;Start-End Date&quot;, startDate, endDate);</span>
+<span class="fc" id="L21">        taskManager.addTask(task);</span>
+
+<span class="fc" id="L23">        assertTrue(task.getEndDate().isAfter(task.getStartDate())); // End date after start date</span>
+<span class="fc" id="L24">        assertEquals(26, ChronoUnit.DAYS.between(task.getStartDate(), task.getEndDate())); // Period check</span>
+<span class="fc" id="L25">        assertEquals(1, taskManager.getAllTasks().size());</span>
+<span class="fc" id="L26">    }</span>
+
+    // Complex Test 2: Task completion date in the past
+    @Test
+    void testRemoveTaskAndCompletionDateInPast() {
+<span class="fc" id="L31">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L32">        LocalDate startDate = LocalDate.of(2024, 9, 1);</span>
+<span class="fc" id="L33">        LocalDate endDate = startDate.plusWeeks(2); // Ends in mid-September</span>
+
+<span class="fc" id="L35">        Task task = new Task(1, &quot;Ibrahim&quot;, &quot;Remove Task&quot;, &quot;Completion Test&quot;, startDate, endDate);</span>
+<span class="fc" id="L36">        taskManager.addTask(task);</span>
+<span class="fc" id="L37">        taskManager.markTaskAsCompleted(task);</span>
+<span class="fc" id="L38">        taskManager.removeTask(task);</span>
+
+<span class="fc" id="L40">        LocalDate completedDate = LocalDate.of(2024, 9, 18); // Set completion date in the past</span>
+<span class="fc" id="L41">        task.setCompletionDate(completedDate);</span>
+
+<span class="fc" id="L43">        assertTrue(task.isCompleted());</span>
+<span class="fc" id="L44">        assertTrue(task.getCompletionDate().isBefore(LocalDate.now())); // Ensure it's before &quot;now&quot;</span>
+<span class="fc" id="L45">        assertEquals(0, taskManager.getAllTasks().size());</span>
+<span class="fc" id="L46">    }</span>
+
+    // Complex Test 3: Overdue task identification using fixed date
+    @Test
+    void testOverdueTask() {
+<span class="fc" id="L51">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L52">        LocalDate startDate = LocalDate.of(2024, 9, 1); // Start date in the past</span>
+<span class="fc" id="L53">        LocalDate dueDate = LocalDate.of(2024, 9, 10); // Overdue by now (October 2024)</span>
+
+<span class="fc" id="L55">        Task task = new Task(1, &quot;Ibrahim&quot;, &quot;Overdue Task&quot;, &quot;Overdue Test&quot;, startDate, dueDate);</span>
+<span class="fc" id="L56">        taskManager.addTask(task);</span>
+
+<span class="fc" id="L58">        assertTrue(LocalDate.now().isAfter(task.getEndDate()));</span>
+<span class="fc" id="L59">        assertEquals(1, taskManager.getPendingTasks().size());</span>
+<span class="fc" id="L60">    }</span>
+
+    // Complex Test 4: Shuffle tasks, check date validity
+    @Test
+    void testShuffleTaskAndDateValidation() {
+<span class="fc" id="L65">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L66">        Task task1 = new Task(1, &quot;Ibrahim&quot;, &quot;Task 1&quot;, &quot;Start Date Shift&quot;, LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 10));</span>
+<span class="fc" id="L67">        Task task2 = new Task(2, &quot;Kevin&quot;, &quot;Task 2&quot;, &quot;Due Date Shift&quot;, LocalDate.of(2024, 9, 5), LocalDate.of(2024, 9, 20));</span>
+<span class="fc" id="L68">        taskManager.addTask(task1);</span>
+<span class="fc" id="L69">        taskManager.addTask(task2);</span>
+
+<span class="fc" id="L71">        taskManager.shiftTaskAround(task1, 1); // Shift task2 position</span>
+<span class="fc" id="L72">        assertTrue(taskManager.getAllTasks().get(0).getStartDate().isAfter(taskManager.getAllTasks().get(1).getStartDate()));</span>
+<span class="fc" id="L73">        assertEquals(2, taskManager.getAllTasks().size());</span>
+<span class="fc" id="L74">    }</span>
+
+    @Test
+    void testOverlappingTasksWithDifferentOwners() {
+<span class="fc" id="L78">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L79">        Task task1 = new Task(1, &quot;Ibrahim&quot;, &quot;Overlapping Task 1&quot;, &quot;This task overlaps with another task.&quot;,</span>
+<span class="fc" id="L80">                LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 15));</span>
+<span class="fc" id="L81">        Task task2 = new Task(2, &quot;Kevin&quot;, &quot;Overlapping Task 2&quot;, &quot;This task overlaps with task 1.&quot;,</span>
+<span class="fc" id="L82">                LocalDate.of(2024, 9, 10), LocalDate.of(2024, 9, 20));</span>
+<span class="fc" id="L83">        Task task3 = new Task(3, &quot;Ibrahim&quot;, &quot;Overlapping Task 3&quot;, &quot;Another overlapping task for Ibrahim.&quot;,</span>
+<span class="fc" id="L84">                LocalDate.of(2024, 9, 5), LocalDate.of(2024, 9, 12));</span>
+
+<span class="fc" id="L86">        taskManager.addTask(task1);</span>
+<span class="fc" id="L87">        taskManager.addTask(task2);</span>
+<span class="fc" id="L88">        taskManager.addTask(task3);</span>
+
+<span class="fc" id="L90">        assertEquals(3, taskManager.getAllTasks().size());</span>
+<span class="fc" id="L91">        assertTrue(task1.getEndDate().isAfter(task2.getStartDate()));</span>
+<span class="fc" id="L92">        assertTrue(task2.getEndDate().isAfter(task1.getStartDate()));</span>
+<span class="fc" id="L93">    }</span>
+
+    @Test
+    void testTaskCompletionUpdates() {
+<span class="fc" id="L97">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L98">        Task task = new Task(1, &quot;Ibrahim&quot;, &quot;Task for Completion&quot;, &quot;Task to test completion updates.&quot;,</span>
+<span class="fc" id="L99">                LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 15));</span>
+<span class="fc" id="L100">        taskManager.addTask(task);</span>
+
+<span class="fc" id="L102">        task.markAsCompleted();</span>
+<span class="fc" id="L103">        task.setCompletionDate(LocalDate.now());</span>
+
+<span class="fc" id="L105">        assertTrue(task.isCompleted());</span>
+<span class="fc" id="L106">        assertNotNull(task.getCompletionDate());</span>
+<span class="fc" id="L107">        assertTrue(task.getCompletionDate().isAfter(task.getEndDate()));</span>
+<span class="fc" id="L108">    }</span>
+
+    @Test
+    void testSequentialTaskDependencies() {
+<span class="fc" id="L112">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L113">        Task task1 = new Task(1, &quot;Ibrahim&quot;, &quot;Task 1&quot;, &quot;First task in a sequence.&quot;,</span>
+<span class="fc" id="L114">                LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 5));</span>
+<span class="fc" id="L115">        Task task2 = new Task(2, &quot;Kevin&quot;, &quot;Task 2&quot;, &quot;Dependent task.&quot;,</span>
+<span class="fc" id="L116">                LocalDate.of(2024, 9, 6), LocalDate.of(2024, 9, 10));</span>
+
+<span class="fc" id="L118">        taskManager.addTask(task1);</span>
+<span class="fc" id="L119">        taskManager.addTask(task2);</span>
+
+<span class="fc" id="L121">        taskManager.markTaskAsCompleted(task1);</span>
+
+<span class="fc" id="L123">        assertEquals(1, taskManager.getCompletedTasks().size());</span>
+<span class="fc" id="L124">        assertTrue(task2.getStartDate().isAfter(task1.getEndDate()));</span>
+<span class="fc" id="L125">    }</span>
+
+    @Test
+    void testTaskReassignment() {
+<span class="fc" id="L129">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L130">        Task task = new Task(1, &quot;Ibrahim&quot;, &quot;Reassign Task&quot;, &quot;Task to test reassignment.&quot;,</span>
+<span class="fc" id="L131">                LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 15));</span>
+<span class="fc" id="L132">        taskManager.addTask(task);</span>
+
+<span class="fc" id="L134">        taskManager.changeOwner(&quot;Kevin&quot;, task);</span>
+
+<span class="fc" id="L136">        assertEquals(&quot;Kevin&quot;, task.getOwner());</span>
+<span class="fc" id="L137">    }</span>
+
+    @Test
+    void testGetTasksOwnedBy() {
+<span class="fc" id="L141">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L142">        Task task1 = new Task(1, &quot;Ibrahim&quot;, &quot;Task 1&quot;, &quot;Task owned by Ibrahim.&quot;,</span>
+<span class="fc" id="L143">                LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 15));</span>
+<span class="fc" id="L144">        Task task2 = new Task(2, &quot;Kevin&quot;, &quot;Task 2&quot;, &quot;Task owned by Kevin.&quot;,</span>
+<span class="fc" id="L145">                LocalDate.of(2024, 9, 10), LocalDate.of(2024, 9, 20));</span>
+<span class="fc" id="L146">        Task task3 = new Task(3, &quot;Ibrahim&quot;, &quot;Task 3&quot;, &quot;Another task owned by Ibrahim.&quot;,</span>
+<span class="fc" id="L147">                LocalDate.of(2024, 9, 5), LocalDate.of(2024, 9, 12));</span>
+
+<span class="fc" id="L149">        taskManager.addTask(task1);</span>
+<span class="fc" id="L150">        taskManager.addTask(task2);</span>
+<span class="fc" id="L151">        taskManager.addTask(task3);</span>
+
+<span class="fc" id="L153">        List&lt;Task&gt; ibrahimTasks = taskManager.getTasksOwnedBy(&quot;Ibrahim&quot;);</span>
+<span class="fc" id="L154">        List&lt;Task&gt; kevinTasks = taskManager.getTasksOwnedBy(&quot;Kevin&quot;);</span>
+
+<span class="fc" id="L156">        assertEquals(2, ibrahimTasks.size());</span>
+<span class="fc" id="L157">        assertEquals(1, kevinTasks.size());</span>
+<span class="fc" id="L158">        assertTrue(ibrahimTasks.contains(task1));</span>
+<span class="fc" id="L159">        assertTrue(ibrahimTasks.contains(task3));</span>
+<span class="fc" id="L160">        assertTrue(kevinTasks.contains(task2));</span>
+<span class="fc" id="L161">    }</span>
+
+    @Test
+    void testUpdateOwnerAndGetTasksOwnedBy() {
+<span class="fc" id="L165">        TaskManager taskManager = new TaskManager();</span>
+<span class="fc" id="L166">        Task task1 = new Task(1, &quot;Ibrahim&quot;, &quot;Task 1&quot;, &quot;Task owned by Ibrahim.&quot;,</span>
+<span class="fc" id="L167">                LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 15));</span>
+<span class="fc" id="L168">        Task task2 = new Task(2, &quot;Kevin&quot;, &quot;Task 2&quot;, &quot;Task owned by Kevin.&quot;,</span>
+<span class="fc" id="L169">                LocalDate.of(2024, 9, 10), LocalDate.of(2024, 9, 20));</span>
+<span class="fc" id="L170">        Task task3 = new Task(3, &quot;Ibrahim&quot;, &quot;Task 3&quot;, &quot;Another task owned by Ibrahim.&quot;,</span>
+<span class="fc" id="L171">                LocalDate.of(2024, 9, 5), LocalDate.of(2024, 9, 12));</span>
+
+<span class="fc" id="L173">        taskManager.addTask(task1);</span>
+<span class="fc" id="L174">        taskManager.addTask(task2);</span>
+<span class="fc" id="L175">        taskManager.addTask(task3);</span>
+
+<span class="fc" id="L177">        List&lt;Task&gt; ibrahimTasks = taskManager.getTasksOwnedBy(&quot;Ibrahim&quot;);</span>
+<span class="fc" id="L178">        List&lt;Task&gt; kevinTasks = taskManager.getTasksOwnedBy(&quot;Kevin&quot;);</span>
+
+<span class="fc" id="L180">        assertEquals(2, ibrahimTasks.size());</span>
+<span class="fc" id="L181">        assertEquals(1, kevinTasks.size());</span>
+<span class="fc" id="L182">        assertTrue(ibrahimTasks.contains(task1));</span>
+<span class="fc" id="L183">        assertTrue(ibrahimTasks.contains(task3));</span>
+<span class="fc" id="L184">        assertTrue(kevinTasks.contains(task2));</span>
+
+        // let's update the owners
+<span class="fc" id="L187">        taskManager.changeOwner(&quot;Ibrahim&quot;, task2);</span>
+
+<span class="fc" id="L189">        ibrahimTasks = taskManager.getTasksOwnedBy(&quot;Ibrahim&quot;);</span>
+
+<span class="fc" id="L191">        assertEquals(3, ibrahimTasks.size());</span>
+<span class="fc" id="L192">        assertTrue(ibrahimTasks.contains(task1));</span>
+<span class="fc" id="L193">        assertTrue(ibrahimTasks.contains(task2));</span>
+<span class="fc" id="L194">        assertTrue(ibrahimTasks.contains(task3));</span>
+<span class="fc" id="L195">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

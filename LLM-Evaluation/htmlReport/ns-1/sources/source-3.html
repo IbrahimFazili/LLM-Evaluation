@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TaskManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.cornell</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskManager (org.cornell)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.cornell;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+<b class="nc">&nbsp;public class TaskManager {</b>
+<b class="nc">&nbsp;    private final List&lt;Task&gt; tasks = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public void addTask(Task task) {
+<b class="nc">&nbsp;        tasks.add(task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeTask(Task task) {
+<b class="nc">&nbsp;        tasks.remove(task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void markTaskAsCompleted(Task task) {
+<b class="nc">&nbsp;        if (tasks.contains(task)) {</b>
+<b class="nc">&nbsp;            task.markAsCompleted();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Task&gt; getAllTasks() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(tasks);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Task&gt; getPendingTasks() {
+<b class="nc">&nbsp;        List&lt;Task&gt; pendingTasks = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Task task : tasks) {</b>
+<b class="nc">&nbsp;            if (!task.isCompleted()) {</b>
+<b class="nc">&nbsp;                pendingTasks.add(task);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return pendingTasks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Task&gt; getCompletedTasks() {
+<b class="nc">&nbsp;        List&lt;Task&gt; completedTasks = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Task task : tasks) {</b>
+<b class="nc">&nbsp;            if (task.isCompleted()) {</b>
+<b class="nc">&nbsp;                completedTasks.add(task);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return completedTasks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void shiftTaskAround(Task task, int position) {
+<b class="nc">&nbsp;        if (position &gt;= tasks.size() || !tasks.contains(task)){</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        tasks.remove(task);</b>
+<b class="nc">&nbsp;        tasks.add(position, task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Task&gt; getTasksOwnedBy(String owner) {
+<b class="nc">&nbsp;        List&lt;Task&gt; rlTask = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Task t: tasks) {</b>
+<b class="nc">&nbsp;            if (t.getOwner().equals(owner)) {</b>
+<b class="nc">&nbsp;                rlTask.add(t);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return rlTask;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void changeOwner(String owner, Task task) {
+<b class="nc">&nbsp;        if (tasks.contains(task)) {</b>
+<b class="nc">&nbsp;            int i = tasks.indexOf(task);</b>
+<b class="nc">&nbsp;            tasks.get(i).setOwner(owner);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-11-03 13:15</div>
+</div>
+</body>
+</html>

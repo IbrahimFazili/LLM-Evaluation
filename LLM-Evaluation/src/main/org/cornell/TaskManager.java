@@ -1,4 +1,4 @@
-package org.cornell;
+package cornell;
 
 import java.util.ArrayList;
 import java.util.List;

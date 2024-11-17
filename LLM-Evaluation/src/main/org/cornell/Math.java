@@ -1,4 +1,4 @@
-package org.cornell;
+package cornell;
 
 import static java.lang.Math.PI;
 

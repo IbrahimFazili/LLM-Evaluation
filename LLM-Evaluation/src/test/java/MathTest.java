@@ -1,6 +1,6 @@
 import org.junit.jupiter.api.Test;
 
-import static org.cornell.Math.*;
+import static cornell.Math.*;
 
 public class MathTest {
     @Test
