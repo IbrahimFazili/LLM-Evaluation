@@ -1,0 +1,13 @@
+.F.
+======================================================================
+FAIL: test2 (__main__.MathTest.test2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kevincui/Desktop/LLM-Evaluation/math_test.py", line 36, in test2
+    self.assertAlmostEqual(abs(radianTest - radian), 0, delta=self.PRECISION)
+AssertionError: 5.4321927955847116e-08 != 0 within 1e-09 delta (5.4321927955847116e-08 difference)
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.405s
+
+FAILED (failures=1)
