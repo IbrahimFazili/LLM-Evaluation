@@ -20,9 +20,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaskManagerTestPython {
 
 //    private static final String CODE_DIRECTORY = Paths.get("").toAbsolutePath().getParent() + "/" + "translation/2024-11-19_19-15-58";
-//    if running from bash script code directory slightly changes
-    private static final String CODE_DIRECTORY = Paths.get("").toAbsolutePath() + "/" + "translation/2024-11-19_19-15-58";
-
+//    if running from bash script code directory slightly changes (no parent in that case)
+    // maybe we save this in a more modular place
+    private static final String CODE_DIRECTORY = Paths.get("").toAbsolutePath() + "/" + "temp/";
+//    private static final String CODE_DIRECTORY = Paths.get("").toAbsolutePath().getParent() + "/" + "temp/";
     private static final String[] PYTHON_SCRIPTS = {
             "Task.py",
             "TaskManager.py"

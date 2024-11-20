@@ -7,7 +7,7 @@
 JAVA_PATH="/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin/java"
 # Output file path
 #OUTPUT_PATH="/Users/ibrahimfazili/OneDrive - Cornell University/CS6158 Software Engineering in Machine Learning/LLM-Evaluation/ConvertedCode/converted.txt"
-OUTPUT_PATH="/Users/kevincui/Desktop/LLM-Evaluation/ConvertedCode/converted3.txt"
+OUTPUT_PATH="/Users/kevincui/Desktop/LLM-Evaluation/ConvertedCode/converted.txt"
 # Additional JVM options and classpath setup, with output redirected to the file
 "$JAVA_PATH" -ea \
   -Didea.test.cyclic.buffer.size=1048576 \

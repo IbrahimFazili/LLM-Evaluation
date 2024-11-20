@@ -21,7 +21,7 @@ For translating test files:
 """
 
 FIND_ERROR_PROMPT = """
-The following errors were manually detected in the code:
+The following errors were manually detected when runnning tests on the code:
 {formatted_errors}
 
 These errors suggest that some methods, attributes, or class references may not have been correctly translated into Python. Please carefully review the following:
