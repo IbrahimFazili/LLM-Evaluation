@@ -5,6 +5,7 @@ import org.graalvm.polyglot.Value;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class MathTestPython {
@@ -12,8 +13,9 @@ public class MathTestPython {
 
     public MathTestPython() throws IOException {
         //adjust the path as needed
+        Path parentPath = Paths.get("").toAbsolutePath().getParent();
         pythonScript = new String(
-                Files.readAllBytes(Paths.get("/Users/kevincui/Desktop/FA 24/cs_6158/LLM-Evaluation/math1.py")));
+                Files.readAllBytes(Paths.get(parentPath + "/translation/test_results/Math.py")));
     }
 
     @Test

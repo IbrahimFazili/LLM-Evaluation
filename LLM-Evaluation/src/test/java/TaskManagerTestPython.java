@@ -7,6 +7,9 @@ import org.graalvm.polyglot.Value;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -16,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskManagerTestPython {
 
-    // tried to use relative path, doesn't work. should probably try to find a way to do that
-    private static final String CODE_DIRECTORY = "/Users/ibrahimfazili/OneDrive - " +
-            "Cornell University/CS6158 Software Engineering in Machine Learning/LLM-Evaluation/LLM-Python-POC/src";
+//    private static final String CODE_DIRECTORY = Paths.get("").toAbsolutePath().getParent() + "/" + "translation/2024-11-19_19-15-58";
+//    if running from bash script code directory slightly changes
+    private static final String CODE_DIRECTORY = Paths.get("").toAbsolutePath() + "/" + "translation/2024-11-19_19-15-58";
 
     private static final String[] PYTHON_SCRIPTS = {
             "Task.py",
