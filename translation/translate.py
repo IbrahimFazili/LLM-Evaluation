@@ -116,22 +116,27 @@ def llm_translate(files, input_dir, output_dir, execute_script_path, error_path,
     run_no = 1
     os.makedirs(output_dir + f'/run{run_no}/')
     response_history = save_outputs(files, input_dir, output_dir+f'/run{run_no}/')
-    errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
-    while errors:
-        print(f'Number of errors: {len(errors)}')
-        if run_no == num_of_retries:
-            break
-        run_no += 1
-
-        print(f'on feedback loop number {run_no-1}')
-        os.makedirs(output_dir + f'/run{run_no}/')
-        response_history = feedback_loop(error_path, files, response_history, output_dir+f'/run{run_no}/')
+    if num_of_retries > 0:
         errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
+        while errors:
+            print("ENTERING FEEDBACK LOOP")
+            if run_no == num_of_retries:
+                break
+            run_no += 1
+            print(f'on feedback loop number {run_no-1}')
+            print(f'Number of errors: {len(errors)}')
+            os.makedirs(output_dir + f'/run{run_no}/')
+            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/run{run_no}/')
+            errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
 
-    if not errors:
-        print("SUCCESSFULLY TRANSLATED!")
+        if not errors:
+            print(f'Number of errors: 0')
+            print("SUCCESSFULLY TRANSLATED!")
+        else:
+            print(f'Number of errors: {len(errors)}')
+            print("WOMP WOMP :(")
     else:
-        print("WOMP WOMP :(")
+        print("NOT ENTERING FEEDBACK LOOP")
 
     return response_history
 if __name__ == "__main__":

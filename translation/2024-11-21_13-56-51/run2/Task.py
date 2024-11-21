@@ -15,15 +15,6 @@ class Task:
     def markAsCompleted(self):
         self.completed = True
 
-    def setOwner(self, owner):
-        self.owner = owner
-
-    def getOwner(self):
-        return self.owner
-
-    def isCompleted(self):
-        return self.completed
-
 
 class TaskManager:
 
