@@ -12,7 +12,7 @@ class TaskManager:
 
     def markTaskAsCompleted(self, task):
         if task in self.tasks:
-            task.markAsCompleted()
+            task.completed = True
 
     def getAllTasks(self):
         return list(self.tasks)
@@ -20,14 +20,14 @@ class TaskManager:
     def getPendingTasks(self):
         pending_tasks = []
         for task in self.tasks:
-            if not task.isCompleted():
+            if not task.completed:
                 pending_tasks.append(task)
         return pending_tasks
 
     def getCompletedTasks(self):
         completed_tasks = []
         for task in self.tasks:
-            if task.isCompleted():
+            if task.completed:
                 completed_tasks.append(task)
         return completed_tasks
 
@@ -40,11 +40,11 @@ class TaskManager:
     def getTasksOwnedBy(self, owner):
         rl_task = []
         for t in self.tasks:
-            if t.getOwner() == owner:
+            if t.owner == owner:
                 rl_task.append(t)
         return rl_task
 
     def changeOwner(self, owner, task):
         if task in self.tasks:
             i = self.tasks.index(task)
-            task.setOwner(owner)
+            task.owner = owner

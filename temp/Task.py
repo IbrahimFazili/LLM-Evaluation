@@ -24,6 +24,9 @@ class Task:
     def isCompleted(self):
         return self.completed
 
+    def setCompleted(self, completed):
+        self.completed = completed
+
 
 class TaskManager:
 
@@ -33,11 +36,11 @@ class TaskManager:
     def addTask(self, task):
         self.tasks.append(task)
 
-    def removeTask(self, task):
-        self.tasks.remove(task)
-
     def getTasks(self):
         return self.tasks
 
-    def markTaskAsCompleted(self, task):
-        task.markAsCompleted()
+    def markTaskAsCompleted(self, taskId):
+        for task in self.tasks:
+            if task.id == taskId:
+                task.markAsCompleted()
+                break
