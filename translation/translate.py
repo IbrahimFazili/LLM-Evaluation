@@ -67,7 +67,7 @@ def gen_llm_output_java2python(input_path, output_path, isPhase2, temp=None, his
 
 def feedback_loop(error_path, files, response_history, output_dir, isPhase2):
     for file in files:
-        response_history[file] = gen_llm_output_java2python(error_path, output_dir + "/" + file + ".py", isPhase2, temp = 0, history=response_history[file], feedback=True)
+        response_history[file] = gen_llm_output_java2python(error_path, output_dir + "/" + file + ".py", isPhase2, temp = 0.2, history=response_history[file], feedback=True)
         shutil.copyfile(output_dir + "/" + file + '.py', 'temp/' + file + '.py')
     return response_history
 
@@ -77,7 +77,7 @@ def save_outputs(files, input_dir, output_dir, isPhase2, response_history=None):
     if not response_history:
         response_history = {}
     for file in files:
-        response_history[file] = gen_llm_output_java2python(input_dir + file + '.java', output_dir + "/" + file + '.py', isPhase2=isPhase2, temp=0)
+        response_history[file] = gen_llm_output_java2python(input_dir + file + '.java', output_dir + "/" + file + '.py', isPhase2=isPhase2, temp=0.2)
         shutil.copyfile(output_dir + "/" + file + '.py', 'temp/' + file + '.py')
         print(f'Generated file: {file}')
     return response_history
@@ -97,7 +97,7 @@ def detect_errors_in_test_output(test_output):
             # Regular expressions to match different error patterns in the test output
             error_patterns = [
                 # Match error trace with test method, error type, error message, and failing line
-                r"(?P<test_name>[\w\.]+)\s+.*?E\s+(?P<error_type>\w+):\s+(?P<error_msg>[^\n]+)\n.*?\n(?P<failing_line>.*?):(?P<line_number>\d+): (?P<error_type_duplicate>\w+)",  
+                r"(?P<test_name>[\w\.]+)\s+.*?E\s+(?P<error_type>\w+):\s+(?P<error_msg>[^\n]+)\n.*?\n(?P<failing_line>.*?):(?P<line_number>\d+): (?P<error_type_duplicate>\w+)",
             ]
 
             # Iterate over the error patterns
@@ -110,7 +110,7 @@ def detect_errors_in_test_output(test_output):
                         f"{match.group('error_msg')} (at {match.group('failing_line')}:{match.group('line_number')})"
                     )
                     errors.append(error_detail)
-            
+
             return errors
     except Exception as e:
         print(f'Error reading file: {e}')
@@ -135,13 +135,13 @@ def detect_error_in_file(file_path):
 
 def check_translation(execute_script_path, output_dir, run_no, response_history, error_path):
     #mutator function that simply abstracts out some of the code
-    with open(output_dir+f'/run{run_no}/'+"response_history.txt", 'w') as f:
+    with open(output_dir+f'/run_{run_no}/'+"response_history.txt", 'w') as f:
         print(response_history, file=f)
     #
     print("Checking answers")
     subprocess.run(execute_script_path, shell=True, capture_output=True, text=True)
     errors = detect_error_in_file(error_path)
-    shutil.copyfile(error_path, output_dir+f'/run{run_no}/'+"error_output.txt")
+    shutil.copyfile(error_path, output_dir+f'/run_{run_no}/'+"error_output.txt")
     return errors
 
 def check_test(test_files, output_dir, run_no, response_history, error_path):
@@ -149,13 +149,13 @@ def check_test(test_files, output_dir, run_no, response_history, error_path):
     Runs the Python test files, saves the response to a text file, and counts errors.
     """
     # Save the response history to a text file
-    with open(output_dir+f'/run{run_no}/'+"response_history.txt", 'w') as f:
+    with open(output_dir+f'/test_run_{run_no}/'+"response_history.txt", 'w') as f:
         print(response_history, file=f)
 
     errors_collected = []  # Collect errors for all test files
 
     for test_file_name in test_files:
-        test_file_path = os.path.join(output_dir, f'run{run_no}', f'{test_file_name}.py')
+        test_file_path = os.path.join('temp', f'{test_file_name}.py')
 
         # Run the Python test file using subprocess
         try:
@@ -176,13 +176,13 @@ def check_test(test_files, output_dir, run_no, response_history, error_path):
             errors = detect_errors_in_test_output(error_path)
 
             # Save the test result to the output folder
-            test_output_path = os.path.join(output_dir, f'run{run_no}', f"{test_file_name}_test_output.txt")
+            test_output_path = os.path.join(output_dir, f'test_run_{run_no}', f"{test_file_name}_test_output.txt")
             with open(test_output_path, 'w') as f:
                 f.write(result.stdout)
 
             # Optionally save the error messages to a separate file
             if errors:
-                error_output_path = os.path.join(output_dir, f'run{run_no}', f"{test_file_name}_error_output.txt")
+                error_output_path = os.path.join(output_dir, f'test_run_{run_no}', f"{test_file_name}_error_output.txt")
                 with open(error_output_path, 'w') as f:
                     f.write("\n".join(errors))
 
@@ -202,53 +202,64 @@ def check_test(test_files, output_dir, run_no, response_history, error_path):
 def llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test, num_of_retries=5):
     os.makedirs(output_dir)
     run_no = 1
-    os.makedirs(output_dir + f'/run{run_no}/')
-    response_history = save_outputs(files, input_dir, output_dir+f'/run{run_no}/', isPhase2=False)
+    os.makedirs(output_dir + f'/run_{run_no}/')
+    print("**** STARTING PHASE 1 ****")
+    response_history = save_outputs(files, input_dir, output_dir+f'/run_{run_no}/', isPhase2=False)
     if num_of_retries > 0:
         errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
+        if errors:
+            print("Errors detected in translated source code, initiating step 1a (feedback loop)")
         while errors:
-            print("ENTERING FEEDBACK LOOP")
+            # print("ENTERING FEEDBACK LOOP")
             if run_no == num_of_retries:
                 break
             run_no += 1
-            print(f'on feedback loop number {run_no-1}')
-            print(f'Number of errors: {len(errors)}')
-            os.makedirs(output_dir + f'/run{run_no}/')
-            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/run{run_no}/', False)
+            print(f'Number of errors detected: {len(errors)}')
+            print(f'Source code loop {run_no-1}')
+            os.makedirs(output_dir + f'/run_{run_no}')
+            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/run_{run_no}', False)
             errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
 
         if not errors:
-            print(f'Number of errors: 0')
-            print("SUCCESSFULLY TRANSLATED!")
+            print(f'Source code successfully translated after {run_no-1} feedback iterations.')
         else:
-            print(f'Number of errors: {len(errors)}')
-            print("WOMP WOMP :(")
+            print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
+            # print("WOMP WOMP :(")
     else:
-        print("NOT ENTERING FEEDBACK LOOP")
+        pass
+        # print("NOT ENTERING FEEDBACK LOOP")
 
-    # phase 2
-    response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/run{run_no}/',True, response_history)
+
+    #PHASE 2
+    print("\n")
+    print("**** PHASE 1 COMPLETE, STARTING PHASE 2 ****")
+    test_run_no = 1
+    os.makedirs(output_dir + f'/test_run_{test_run_no}')
+    response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/test_run_{test_run_no}',True, response_history)
     if num_of_retries > 0:
-        delta = 1
-        errors = check_test(testFiles, output_dir, run_no, response_history, error_path)
+        errors = check_test(testFiles, output_dir, test_run_no, response_history, error_path)
+        if errors:
+            print("Errors detected in translated test files, initiating step 2a (feedback loop)")
         while errors:
-            print("ENTERING FEEDBACK LOOP")
-            if delta == num_of_retries:
+            if test_run_no == num_of_retries:
                 break
-            delta += 1
-            print(f'on feedback loop number {delta-1}')
-            print(f'Number of errors: {len(errors)}')
-            response_history = feedback_loop(error_path, testFiles, response_history, output_dir+f'/run{run_no}/', True)
-            errors = check_test(testFiles, output_dir, run_no, response_history, error_path)
+            test_run_no += 1
+            print(f'Number of errors detected: {len(errors)}')
+            print(f'Test code loop {test_run_no-1}')
+            os.makedirs(output_dir + f'/test_run_{test_run_no}')
+            response_history = feedback_loop(error_path, testFiles, response_history, output_dir+f'/test_run_{test_run_no}', True)
+            errors = check_test(testFiles, output_dir, test_run_no, response_history, error_path)
 
         if not errors:
-            print(f'Number of errors: 0')
-            print("SUCCESSFULLY TRANSLATED!")
+            print(f'Test code successfully translated after {test_run_no-1} feedback iterations.')
         else:
-            print(f'Number of errors: {len(errors)}')
-            print("WOMP WOMP :(")
+            print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
+            # print("WOMP WOMP :(")
     else:
-        print("NOT ENTERING FEEDBACK LOOP")
+        pass
+
+    print("**** PHASE 2 COMPLETE****")
+    print(f'Results saved in {output_dir}')
 
     return response_history
 if __name__ == "__main__":
@@ -264,4 +275,5 @@ if __name__ == "__main__":
     input_dir_test = 'LLM-Evaluation/src/test/java/'
 
     llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test)
+
 

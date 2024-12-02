@@ -23,7 +23,7 @@ For translating test files:
 """
 
 FIND_ERROR_PROMPT = """
-The following errors were manually detected when runnning tests on the code:
+The following errors were manually detected when running tests on the code:
 {formatted_errors}
 
 These errors suggest that some methods, attributes, or class references may not have been correctly translated into Python. Please carefully review the following:
@@ -36,6 +36,8 @@ If the errors are related to test files, remember the specific instructions for 
 If there are any issues with missing methods, undefined attributes, or incorrect method references in the translated Python code, please correct them. When you fix these errors, output only the corrected Python code, without '``` python' or '```' delimiters.
 
 Please remember the rules that were mentioned earlier about method and class translation.
+
+It is possible that the generated class was correct, and this specific file had no issues. Please make sure that whatever code is generated has the same class name as the original Java class. Do NOT generate any other classes.
 """
 
 BASE_SETUP = [
@@ -44,3 +46,4 @@ BASE_SETUP = [
 
 #OPTIONAL FOURTH LINE
 # 4. If required, you can import other Python modules as needed. If a class under test needs to be accessed as module-level variables, you can import it as a module.
+
