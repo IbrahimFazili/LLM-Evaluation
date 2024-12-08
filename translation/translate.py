@@ -265,14 +265,17 @@ def llm_translate(files, input_dir, output_dir, execute_script_path, error_path,
 if __name__ == "__main__":
     #files should only correspond to the files within a given package
 
-    files = ["Task", "TaskManager"]
-    input_dir = 'LLM-Evaluation/src/main/org/cornell/'
+    # files = ["Task", "TaskManager"]
+    files = ['AccurateMath', "AccurateMathCalc", "AccurateMathLiteralArrays"]
+    # input_dir = 'LLM-Evaluation/src/main/org/cornell/'
+    input_dir = 'commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/'
     output_dir = os.path.join(os.getcwd(), 'translation/', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     execute_script_path = "translation/execute_java_kc_local.sh"
     error_path = "ConvertedCode/converted.txt"
-    #
-    testFiles = ["TaskManagerTest"]
-    input_dir_test = 'LLM-Evaluation/src/test/java/'
+    testFiles = "AccurateMathStrictComparisonTest"
+    # testFiles = ["TaskManagerTest"]
+    # input_dir_test = 'LLM-Evaluation/src/test/java/'
+    input_dir_test = "commons-math/commons-math-legacy-core/src/test/java/org/apache/commons/math4/legacy/core/jdkmath/"
 
     llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test)
 
