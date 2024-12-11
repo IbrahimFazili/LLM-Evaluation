@@ -267,19 +267,21 @@ def llm_translate(files, input_dir, output_dir, execute_script_path, error_path,
 
     return response_history
 
-def mixed_modality(files, input_dir, output_dir, error_path, testFiles, num_of_retries=DEFAULT_NUM_RETRIES):
+def mixed_modality(files, input_dir, output_dir, error_path, testFiles, input_dir_test, num_of_retries=DEFAULT_NUM_RETRIES):
     #called on sandbox = 1
     #a mix of phase 1 and phase 2
     #testing translated source code on ground truth proven translated tests
     os.makedirs(output_dir)
     print("**** STARTING MIXED MODALITY TRANSLATION ****")
     run_no = 1
-    os.makedirs(output_dir + f'/mm_run_{run_no}/')
+    os.makedirs(output_dir + f'/test_run_{run_no}/')
     print("1")
-    response_history = save_outputs(files, input_dir, output_dir+f'/mm_run_{run_no}/', isPhase2=False)
+    response_history = save_outputs(files, input_dir, output_dir+f'/test_run_{run_no}/', isPhase2=False)
     print("2")
     if num_of_retries > 0:
         print("3")
+        for testFile in testFiles:
+            shutil.copyfile(input_dir_test + "/" + testFIle + '.py', 'temp/' + testFile + '.py')
         errors = check_test(testFiles, output_dir, run_no, response_history, error_path)
         if errors:
             print("Errors detected in translated source files. Triggering feedback loop: ")
@@ -289,8 +291,8 @@ def mixed_modality(files, input_dir, output_dir, error_path, testFiles, num_of_r
             run_no += 1
             print(f'Number of errors detected: {len(errors)}')
             print(f'Feedback loop {run_no-1}')
-            os.makedirs(output_dir + f'/mm_run_{run_no}')
-            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/mm_run_{run_no}', True)
+            os.makedirs(output_dir + f'/test_run_{run_no}')
+            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/test_run_{run_no}', True)
             errors = check_test(testFiles, output_dir, run_no, response_history, error_path)
 
         if not errors:
@@ -344,6 +346,7 @@ if __name__ == "__main__":
             output_dir=args.output_dir,
             error_path="ConvertedCode/converted.txt",
             testFiles=args.test_files,
+            input_dir_test=args.input_dir_test
         )
     else:
         llm_translate(
@@ -359,7 +362,7 @@ if __name__ == "__main__":
     #e.g.
     #python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/
     #sandbox code:
-    #python3 translation/translate.py --files AccurateMath AccurateMathCalc AccurateMathLiteralArrays  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathStrictComparisonTest --input_dir_test commons-math/commons-math-legacy-core/src/test/java/org/apache/commons/math4/legacy/core/jdkmath/ --sandbox 1
+    #python3 translation/translate.py --files AccurateMath AccurateMathCalc AccurateMathLiteralArrays  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test ConvertedCode/ --sandbox 1
 
 
 #     llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test)
