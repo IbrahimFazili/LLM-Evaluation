@@ -44,6 +44,8 @@ BASE_SETUP = [
     {"role": "system", "content": SYSTEM_PROMPT},
 ]
 
+DEFAULT_NUM_RETRIES = 5
+
 #OPTIONAL FOURTH LINE
 # 4. If required, you can import other Python modules as needed. If a class under test needs to be accessed as module-level variables, you can import it as a module.
 

@@ -3,6 +3,7 @@ import os, datetime
 import subprocess
 import re
 import shutil
+import argparse
 
 
 def send_to_llm(input_prompt, temp=None, history=None):
@@ -199,11 +200,10 @@ def check_test(test_files, output_dir, run_no, response_history, error_path):
     else:
         return []  # No errors
 
-def llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test, num_of_retries=5):
-    os.makedirs(output_dir)
+
+def phase_1(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries):
     run_no = 1
     os.makedirs(output_dir + f'/run_{run_no}/')
-    print("**** STARTING PHASE 1 ****")
     response_history = save_outputs(files, input_dir, output_dir+f'/run_{run_no}/', isPhase2=False)
     if num_of_retries > 0:
         errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
@@ -225,17 +225,12 @@ def llm_translate(files, input_dir, output_dir, execute_script_path, error_path,
         else:
             print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
             # print("WOMP WOMP :(")
-    else:
-        pass
-        # print("NOT ENTERING FEEDBACK LOOP")
+    return response_history, errors
 
-
-    #PHASE 2
-    print("\n")
-    print("**** PHASE 1 COMPLETE, STARTING PHASE 2 ****")
+def phase_2(output_dir, error_path, testFiles, input_dir_test, history, num_of_retries):
     test_run_no = 1
     os.makedirs(output_dir + f'/test_run_{test_run_no}')
-    response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/test_run_{test_run_no}',True, response_history)
+    response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/test_run_{test_run_no}',True, history)
     if num_of_retries > 0:
         errors = check_test(testFiles, output_dir, test_run_no, response_history, error_path)
         if errors:
@@ -255,28 +250,118 @@ def llm_translate(files, input_dir, output_dir, execute_script_path, error_path,
         else:
             print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
             # print("WOMP WOMP :(")
-    else:
-        pass
+    return response_history
 
+def llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test, testing_phase_2=True, num_of_retries=DEFAULT_NUM_RETRIES):
+    print("**** STARTING PHASE 1 ****")
+    os.makedirs(output_dir)
+    response_history, errors = phase_1(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries)
+    print("\n")
+    print("**** PHASE 1 COMPLETE, STARTING PHASE 2 ****")
+    #if there are errors, we should only run the test generation once because the source code had issues
+    if errors:
+        num_of_retries = 0
+    response_history = phase_2(output_dir, error_path, testFiles, input_dir_test, response_history, num_of_retries)
     print("**** PHASE 2 COMPLETE****")
     print(f'Results saved in {output_dir}')
 
     return response_history
+
+def mixed_modality(files, input_dir, output_dir, error_path, testFiles, num_of_retries=DEFAULT_NUM_RETRIES):
+    #called on sandbox = 1
+    #a mix of phase 1 and phase 2
+    #testing translated source code on ground truth proven translated tests
+    os.makedirs(output_dir)
+    print("**** STARTING MIXED MODALITY TRANSLATION ****")
+    run_no = 1
+    os.makedirs(output_dir + f'/mm_run_{run_no}/')
+    print("1")
+    response_history = save_outputs(files, input_dir, output_dir+f'/mm_run_{run_no}/', isPhase2=False)
+    print("2")
+    if num_of_retries > 0:
+        print("3")
+        errors = check_test(testFiles, output_dir, run_no, response_history, error_path)
+        if errors:
+            print("Errors detected in translated source files. Triggering feedback loop: ")
+        while errors:
+            if run_no == num_of_retries:
+                break
+            run_no += 1
+            print(f'Number of errors detected: {len(errors)}')
+            print(f'Feedback loop {run_no-1}')
+            os.makedirs(output_dir + f'/mm_run_{run_no}')
+            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/mm_run_{run_no}', True)
+            errors = check_test(testFiles, output_dir, run_no, response_history, error_path)
+
+        if not errors:
+            print(f'Code successfully translated after {run_no-1} feedback iterations.')
+        else:
+            print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
+    print("MIXED MODALITY TRANSLATION COMPLETE")
+    print(f'Results saved in {output_dir}')
+    return response_history
+
+
+# if __name__ == "__main__":
+#     #files should only correspond to the files within a given package
+#
+#     files = ["Task", "TaskManager"]
+# #     files = ['AccurateMath', "AccurateMathCalc", "AccurateMathLiteralArrays"]
+#     input_dir = 'LLM-Evaluation/src/main/org/cornell/'
+# #     input_dir = 'commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/'
+#     output_dir = os.path.join(os.getcwd(), 'translation/', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+#     execute_script_path = "translation/execute_java_kc_local.sh"
+#     error_path = "ConvertedCode/converted.txt"
+# #     testFiles = "AccurateMathStrictComparisonTest"
+#     testFiles = ["TaskManagerTest"]
+#     input_dir_test = 'LLM-Evaluation/src/test/java/'
+# #     input_dir_test = "commons-math/commons-math-legacy-core/src/test/java/org/apache/commons/math4/legacy/core/jdkmath/"
+
 if __name__ == "__main__":
-    #files should only correspond to the files within a given package
+    parser = argparse.ArgumentParser(description="Run LLM translation script with specified parameters.")
 
-    # files = ["Task", "TaskManager"]
-    files = ['AccurateMath', "AccurateMathCalc", "AccurateMathLiteralArrays"]
-    # input_dir = 'LLM-Evaluation/src/main/org/cornell/'
-    input_dir = 'commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/'
-    output_dir = os.path.join(os.getcwd(), 'translation/', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
-    execute_script_path = "translation/execute_java_kc_local.sh"
-    error_path = "ConvertedCode/converted.txt"
-    testFiles = "AccurateMathStrictComparisonTest"
-    # testFiles = ["TaskManagerTest"]
-    # input_dir_test = 'LLM-Evaluation/src/test/java/'
-    input_dir_test = "commons-math/commons-math-legacy-core/src/test/java/org/apache/commons/math4/legacy/core/jdkmath/"
+    parser.add_argument('--files', nargs='+', required=True, help='List of files within a given package')
+    parser.add_argument('--input_dir', required=True, help='Input directory path')
+    parser.add_argument('--output_dir', help='Output directory path') #not required
+    parser.add_argument('--execute_script_path', help='Path to the execute script') #not required
+    parser.add_argument('--test_files', nargs='+', required=True, help='List of test files')
+    parser.add_argument('--input_dir_test', required=True, help='Input directory path for test files')
+    parser.add_argument('--sandbox', help='Sandbox codes for running parts of the translation process independently')
 
-    llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test)
+    args = parser.parse_args()
+
+    if args.output_dir is None:
+        args.output_dir = os.path.join(os.getcwd(), 'translation/', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    if args.execute_script_path is None:
+        args.execute_script_path = "translation/execute_java_kc_local.sh"
+    if args.sandbox is None:
+        args.sandbox = 0
+
+    if int(args.sandbox) == 1:
+        mixed_modality(
+            files=args.files,
+            input_dir=args.input_dir,
+            output_dir=args.output_dir,
+            error_path="ConvertedCode/converted.txt",
+            testFiles=args.test_files,
+        )
+    else:
+        llm_translate(
+            files=args.files,
+            input_dir=args.input_dir,
+            output_dir=args.output_dir,
+            execute_script_path=args.execute_script_path,
+            error_path="ConvertedCode/converted.txt",
+            testFiles=args.test_files,
+            input_dir_test=args.input_dir_test
+        )
+
+    #e.g.
+    #python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/
+    #sandbox code:
+    #python3 translation/translate.py --files AccurateMath AccurateMathCalc AccurateMathLiteralArrays  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathStrictComparisonTest --input_dir_test commons-math/commons-math-legacy-core/src/test/java/org/apache/commons/math4/legacy/core/jdkmath/ --sandbox 1
+
+
+#     llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test)
 
 
