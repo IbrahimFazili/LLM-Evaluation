@@ -1,17 +1,10 @@
-package org.cornell;
+package cornell;
 
 import static java.lang.Math.PI;
 
 public class Math {
-     /***
-      * This is meant to serve as a small POC for testing our prompt model.
-      * This represents a small example of what the underlying implementation of
-      * Oracle's JDK Math library found here
-      * https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/lang/Math.java.
-      * This is not meant to be an exhaustive list, just a few functions from the class
-      * @TODO: confirm with Kevin if the following fucntions are enough for a POC
-      ***/
-     public static double PRECISION = 1e-4;
+
+    public static double PRECISION = 1e-4;
 
     public static double abs(double a) {
         if (a < 0) {

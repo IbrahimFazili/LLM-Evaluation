@@ -1,5 +1,5 @@
-import org.cornell.Task;
-import org.cornell.TaskManager;
+import cornell.Task;
+import cornell.TaskManager;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -68,8 +68,8 @@ class TaskManagerTest {
         taskManager.addTask(task1);
         taskManager.addTask(task2);
 
-        taskManager.shiftTaskAround(task2, 1); // Shift task2 position
-        assertTrue(task2.getStartDate().isAfter(task1.getStartDate()));
+        taskManager.shiftTaskAround(task1, 1); // Shift task2 position
+        assertTrue(taskManager.getAllTasks().get(0).getStartDate().isAfter(taskManager.getAllTasks().get(1).getStartDate()));
         assertEquals(2, taskManager.getAllTasks().size());
     }
 
@@ -131,7 +131,7 @@ class TaskManagerTest {
                 LocalDate.of(2024, 9, 1), LocalDate.of(2024, 9, 15));
         taskManager.addTask(task);
 
-        task.setOwner("Kevin");
+        taskManager.changeOwner("Kevin", task);
 
         assertEquals("Kevin", task.getOwner());
     }
