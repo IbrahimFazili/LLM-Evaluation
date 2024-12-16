@@ -131,11 +131,11 @@ def llm_translate(files, input_dir, output_dir, execute_script_path, error_path,
     print("**** PHASE 2 COMPLETE ****")
     print("\n")
 
-    with open(output_dir + "results.txt", 'w') as output_file:
-        output_file.write(f'Number of phase 1 runs: {run_no}')
-        output_file.write(f'Phase 1 Succeeded or not?: {p1_success}')
-        output_file.write(f'Number of phase 2 runs: {test_run_no}')
-        output_file.write(f'Succeeded? or not: {p2_success}')
+    with open(output_dir + "/results.txt", 'w') as output_file:
+        output_file.write(f'Number of phase 1 runs: {run_no}\n')
+        output_file.write(f'Phase 1 Succeeded or not?: {p1_success}\n')
+        output_file.write(f'Number of phase 2 runs: {test_run_no}\n')
+        output_file.write(f'Succeeded? or not: {p2_success}\n')
     print(f'Results saved in {output_dir}')
     return response_history
 
