@@ -54,4 +54,25 @@ Then you can run it like the following:
 
 `graalpy --jvm --vm.cp="/Users/ibrahimfazili/OneDrive - Cornell University/CS6158 Software Engineering in Machine Learning/LLM-Evaluation/LLM-Evaluation/src/main/" /Users/ibrahimfazili/OneDrive\ -\ Cornell\ University/CS6158\ Software\ Engineering\ in\ Machine\ Learning/LLM-Evaluation/LLM-Python-POC/test/TaskManagerTestJava.py`
 
+## Running POC
+
+To run the POC you will need to modify the following lines in `translation/execute_java_kc_local.sh`
+- Line 7 -> this should be the path to the GraalVM JDK you installed earlier
+- Line 10 -> this should be the absolute path to the `ConvertedCode/converted.txt` within the repository
+- Lines 12 onward -> this should just be a simple replacement of the users with your to point to the right `.m2` directory on Macs.
+- Additional note: if you need to run the Math POC you will need to update Line 18 with 'MathTestPython'
+
+Then to run it (for Task + TaskManager) you can do the following
+`#python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/`
+
+To run Math, you will need to update the args to be `... --files Math .... --test_files MathTest`
+
+## Running on Apache Math
+
+Apache Math is not included by default in the repository as it would be too large. You will need to clone it from here `https://github.com/apache/commons-math.git` in the main directory of the repository.
+
+To run,
+
+`python3 translation/translate.py --files AccurateMath AccurateMathCalc  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test ConvertedCode/ --sandbox 1`
+
 The rest TBD
