@@ -32,7 +32,7 @@ def source_code_translate(files, input_dir, output_dir, execute_script_path, err
     return response_history, errors, run_no
 
 #p2
-def source_test_translate(output_dir, error_path, testFiles, input_dir_test, history, num_of_retries):
+def source_test_translate(output_dir, error_path, testFiles, input_dir_test, history, files, run_no, num_of_retries):
     test_run_no = 1
     os.makedirs(output_dir + f'/test_run_{test_run_no}')
     response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/test_run_{test_run_no}',True, history)
@@ -51,15 +51,23 @@ def source_test_translate(output_dir, error_path, testFiles, input_dir_test, his
             response_history = feedback_loop(error_path, testFiles, response_history, output_dir+f'/test_run_{test_run_no}', True)
             errors = check_test(testFiles, output_dir, test_run_no, response_history, error_path)
 
+            #phase 2b
+            if not errors:
+                print("Initiating phase 2b: Mutation Testing")
+                mutation_test_errors = mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
+    #             if not passing_mutation_test:
+                if not mutation_test_errors:
+                    break
+                else:
+                    errors = mutation_test_errors
         if not errors:
             print(f'Test code successfully translated after {test_run_no-1} feedback iterations.')
-            success = True
         else:
             print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
             # print("WOMP WOMP :(")
-    return response_history, success, test_run_no
+    return response_history
 
-#p3
+#p2b
 def mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path):
     #first copy all necessary files into temp
     for testFile in testFiles:
@@ -71,6 +79,7 @@ def mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
 
         #running mutation testing (should fail at least once for each)
         num_fp_files = 0
+        return_errors = []
         for test_file_name in testFiles:
             test_file_path = os.path.join('temp/', f'{test_file_name}.py')
             try:
@@ -88,6 +97,7 @@ def mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
                 errors = detect_errors_in_test_output(error_path)
                 if not errors:
                     print(f'Mutation test failed (actual test passed) for {test_file_name} in run_no: {i}')
+                    return_errors.append(f'Mutation test failed (actual test passed) for {test_file_name} in run_no: {i}')
                 if errors:
                     num_fp_files += 1
             except subprocess.CalledProcessError as e:
@@ -99,7 +109,8 @@ def mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
             num_fn_iterations += 1
         num_fp_files = 0
     if num_fn_iterations == 0: #GOOD!
-        print(f'Mutation testing successfully passed for all runs from run numbers 1 to {run_no}.')
+        print(f'Mutation testing succeeded for all runs from run numbers 1 to {run_no}.')
+    return return_errors
 
 
 def llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test, testing_phase_2=True, num_of_retries=DEFAULT_NUM_RETRIES):
@@ -112,14 +123,14 @@ def llm_translate(files, input_dir, output_dir, execute_script_path, error_path,
     #if there are errors, we should only run the test generation once because the source code had issues
     if errors:
         num_of_retries = 0
-    response_history, success, test_run_no = source_test_translate(output_dir, error_path, testFiles, input_dir_test, response_history, num_of_retries)
+    response_history = source_test_translate(output_dir, error_path, testFiles, input_dir_test, response_history, files, run_no, num_of_retries)
     print("**** PHASE 2 COMPLETE ****")
     print("\n")
-    if success:
-        print("**** INITIATING PHASE 3: Translated Test Mutation Testing")
-        mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
-        print("**** PHASE 3 COMPLETE ****")
-        print("\n")
+#     if success:
+#         print("**** INITIATING PHASE 2b: Translated Test Mutation Testing")
+#         mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
+#         print("**** PHASE 2b COMPLETE ****")
+#         print("\n")
     print(f'Results saved in {output_dir}')
 
     return response_history
