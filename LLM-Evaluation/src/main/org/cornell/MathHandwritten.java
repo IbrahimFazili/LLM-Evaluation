@@ -2,7 +2,7 @@ package cornell;
 
 import static java.lang.Math.PI;
 
-public class Math {
+public class MathHandwritten {
 
     public static double PRECISION = 1e-4;
 

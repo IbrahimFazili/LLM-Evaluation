@@ -13,9 +13,9 @@ public class MathTestPython {
 
     public MathTestPython() throws IOException {
         //adjust the path as needed
-        Path parentPath = Paths.get("").toAbsolutePath().getParent();
+        Path parentPath = Paths.get("").toAbsolutePath();
         pythonScript = new String(
-                Files.readAllBytes(Paths.get(parentPath + "/translation/test_results/Math.py")));
+                Files.readAllBytes(Paths.get(parentPath + "/temp/MathHandwritten.py")));
     }
 
     @Test

@@ -35,16 +35,18 @@ If the errors are related to test files, remember the specific instructions for 
 
 If there are any issues with missing methods, undefined attributes, or incorrect method references in the translated Python code, please correct them. When you fix these errors, output only the corrected Python code, without '``` python' or '```' delimiters.
 
-Please remember the rules that were mentioned earlier about method and class translation.
+Please remember the rules that were mentioned earlier about method and class translation. If there are precision errors, decrease the precision.
 
 It is possible that the generated class was correct, and this specific file had no issues. Please make sure that whatever code is generated has the same class name as the original Java class. Do NOT generate any other classes.
+
+The files are located in the same directory but are all class-defined, so write imports as "import module_name" instead of "from module_name import *". Also include additional Python imports as needed.
 """
 
 BASE_SETUP = [
     {"role": "system", "content": SYSTEM_PROMPT},
 ]
 
-DEFAULT_NUM_RETRIES = 10
+DEFAULT_NUM_RETRIES = 5
 
 #OPTIONAL FOURTH LINE
 # 4. If required, you can import other Python modules as needed. If a class under test needs to be accessed as module-level variables, you can import it as a module.
