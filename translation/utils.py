@@ -65,19 +65,19 @@ def gen_llm_output_java2python(input_path, output_path, isPhase2, temp=None, his
     # we affect history in send_to_llm in response, so we can return it in case of use in feedback loop
     return hist
 
-def feedback_loop(error_path, files, response_history, output_dir, isPhase2):
+def feedback_loop(error_path, files, response_history, output_dir, isPhase2, temp):
     for file in files:
-        response_history[file] = gen_llm_output_java2python(error_path, output_dir + "/" + file + ".py", isPhase2, temp = 0.2, history=response_history[file], feedback=True)
+        response_history[file] = gen_llm_output_java2python(error_path, output_dir + "/" + file + ".py", isPhase2, temp = temp, history=response_history[file], feedback=True)
         shutil.copyfile(output_dir + "/" + file + '.py', 'temp/' + file + '.py')
     return response_history
 
 
-def save_outputs(files, input_dir, output_dir, isPhase2, response_history=None):
+def save_outputs(files, input_dir, output_dir, isPhase2, response_history=None, temp=0.2):
     #we want to keep a tally of the histories for each of the responses
     if not response_history:
         response_history = {}
     for file in files:
-        response_history[file] = gen_llm_output_java2python(input_dir + file + '.java', output_dir + "/" + file + '.py', isPhase2=isPhase2, temp=0.2)
+        response_history[file] = gen_llm_output_java2python(input_dir + file + '.java', output_dir + "/" + file + '.py', isPhase2=isPhase2, temp=temp)
         shutil.copyfile(output_dir + "/" + file + '.py', 'temp/' + file + '.py')
         print(f'Generated file: {file}')
     return response_history
@@ -203,30 +203,6 @@ def check_test(test_files, output_dir, run_no, response_history, error_path):
     else:
         return []  # No errors
 
-#p1
-def source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries):
-    run_no = 1
-    os.makedirs(output_dir + f'/run_{run_no}/')
-    response_history = save_outputs(files, input_dir, output_dir+f'/run_{run_no}/', isPhase2=False)
-    if num_of_retries > 0:
-        errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
-        if errors:
-            print("Errors detected in translated source code, initiating step 1a (feedback loop)")
-        while errors:
-            if run_no == num_of_retries:
-                break
-            run_no += 1
-            print(f'Number of errors detected: {len(errors)}')
-            print(f'Source code loop {run_no-1}')
-            os.makedirs(output_dir + f'/run_{run_no}')
-            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/run_{run_no}', False)
-            errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
-
-        if not errors:
-            print(f'Source code successfully translated after {run_no-1} feedback iterations.')
-        else:
-            print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
-    return response_history, errors, run_no
 
     if __name__ == "__main__":
         pass

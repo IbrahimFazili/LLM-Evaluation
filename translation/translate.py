@@ -7,10 +7,10 @@ import shutil
 import argparse
 
 #p1
-def source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries):
+def source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries, temp):
     run_no = 1
     os.makedirs(output_dir + f'/run_{run_no}/')
-    response_history = save_outputs(files, input_dir, output_dir+f'/run_{run_no}/', isPhase2=False)
+    response_history = save_outputs(files, input_dir, output_dir+f'/run_{run_no}/', isPhase2=False, temp=temp)
     if num_of_retries > 0:
         errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
         if errors:
@@ -22,7 +22,7 @@ def source_code_translate(files, input_dir, output_dir, execute_script_path, err
             print(f'Number of errors detected: {len(errors)}')
             print(f'Source code loop {run_no-1}')
             os.makedirs(output_dir + f'/run_{run_no}')
-            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/run_{run_no}', False)
+            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/run_{run_no}', False, temp)
             errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
 
         if not errors:
@@ -32,11 +32,10 @@ def source_code_translate(files, input_dir, output_dir, execute_script_path, err
     return response_history, errors, run_no
 
 #p2
-def source_test_translate(output_dir, error_path, testFiles, input_dir_test, history, files, run_no, num_of_retries):
+def source_test_translate(output_dir, error_path, testFiles, input_dir_test, history, files, run_no, num_of_retries, temp):
     test_run_no = 1
     os.makedirs(output_dir + f'/test_run_{test_run_no}')
-    response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/test_run_{test_run_no}',True, history)
-    success = False
+    response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/test_run_{test_run_no}',True, history, temp=temp)
     if num_of_retries > 0:
         errors = check_test(testFiles, output_dir, test_run_no, response_history, error_path)
         if errors:
@@ -48,7 +47,7 @@ def source_test_translate(output_dir, error_path, testFiles, input_dir_test, his
             print(f'Number of errors detected: {len(errors)}')
             print(f'Test code loop {test_run_no-1}')
             os.makedirs(output_dir + f'/test_run_{test_run_no}')
-            response_history = feedback_loop(error_path, testFiles, response_history, output_dir+f'/test_run_{test_run_no}', True)
+            response_history = feedback_loop(error_path, testFiles, response_history, output_dir+f'/test_run_{test_run_no}', True, temp)
             errors = check_test(testFiles, output_dir, test_run_no, response_history, error_path)
 
             #phase 2b
@@ -113,30 +112,25 @@ def mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
     return return_errors
 
 
-def llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test, testing_phase_2=True, num_of_retries=DEFAULT_NUM_RETRIES):
+def llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test, testing_phase_2=True, num_of_retries=DEFAULT_NUM_RETRIES, temp = 0.2):
     print("**** STARTING PHASE 1: Source Code Translation ****")
     os.makedirs(output_dir)
-    response_history, errors, run_no = source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries)
+    response_history, errors, run_no = source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries, temp)
     print("**** PHASE 1 COMPLETE ****")
     print("\n")
     print("**** STARTING PHASE 2: Source Test Translation ****")
     #if there are errors, we should only run the test generation once because the source code had issues
     if errors:
         num_of_retries = 0
-    response_history = source_test_translate(output_dir, error_path, testFiles, input_dir_test, response_history, files, run_no, num_of_retries)
+    response_history = source_test_translate(output_dir, error_path, testFiles, input_dir_test, response_history, files, run_no, num_of_retries, temp)
     print("**** PHASE 2 COMPLETE ****")
     print("\n")
-#     if success:
-#         print("**** INITIATING PHASE 2b: Translated Test Mutation Testing")
-#         mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
-#         print("**** PHASE 2b COMPLETE ****")
-#         print("\n")
     print(f'Results saved in {output_dir}')
 
     return response_history
 
 
-def mixed_modality_translate(files, input_dir, output_dir, error_path, testFiles, input_dir_test, num_of_retries=DEFAULT_NUM_RETRIES):
+def mixed_modality_translate(files, input_dir, output_dir, error_path, testFiles, input_dir_test, num_of_retries=DEFAULT_NUM_RETRIES, temp = 0.2):
     #called on sandbox = 1
     #a mix of phase 1 and phase 2
     #testing translated source code on ground truth proven translated tests
@@ -144,7 +138,7 @@ def mixed_modality_translate(files, input_dir, output_dir, error_path, testFiles
     print("**** STARTING MIXED MODALITY TRANSLATION ****")
     run_no = 1
     os.makedirs(output_dir + f'/test_run_{run_no}/')
-    response_history = save_outputs(files, input_dir, output_dir+f'/test_run_{run_no}/', isPhase2=False)
+    response_history = save_outputs(files, input_dir, output_dir+f'/test_run_{run_no}/', isPhase2=False, temp = temp)
     if num_of_retries > 0:
         for testFile in testFiles:
             shutil.copyfile(input_dir_test + "/" + testFile + '.py', 'temp/' + testFile + '.py')
@@ -158,7 +152,7 @@ def mixed_modality_translate(files, input_dir, output_dir, error_path, testFiles
             print(f'Number of errors detected: {len(errors)}')
             print(f'Feedback loop {run_no-1}')
             os.makedirs(output_dir + f'/test_run_{run_no}')
-            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/test_run_{run_no}', True)
+            response_history = feedback_loop(error_path, files, response_history, output_dir+f'/test_run_{run_no}', True, temp)
             errors = check_test(testFiles, output_dir, run_no, response_history, error_path)
 
         if not errors:
@@ -179,6 +173,7 @@ if __name__ == "__main__":
     parser.add_argument('--execute_script_path', help='Path to the execute script') #not required
     parser.add_argument('--test_files', nargs='+', required=True, help='List of test files')
     parser.add_argument('--input_dir_test', required=True, help='Input directory path for test files')
+    parser.add_argument('--temperature', help='Input temperature for code generation')
     parser.add_argument('--sandbox', help='Sandbox codes for running parts of the translation process independently')
 
     args = parser.parse_args()
@@ -189,6 +184,8 @@ if __name__ == "__main__":
         args.execute_script_path = "translation/execute_java_kc_local.sh"
     if args.sandbox is None:
         args.sandbox = 0
+    if args.temperature is None:
+            args.temperature = 0.2
 
     if int(args.sandbox) == 1:
         mixed_modality_translate(
@@ -197,7 +194,8 @@ if __name__ == "__main__":
             output_dir=args.output_dir,
             error_path="ConvertedCode/converted.txt",
             testFiles=args.test_files,
-            input_dir_test=args.input_dir_test
+            input_dir_test=args.input_dir_test,
+            temp=float(args.temperature),
         )
     else:
         llm_translate(
@@ -207,7 +205,8 @@ if __name__ == "__main__":
             execute_script_path=args.execute_script_path,
             error_path="ConvertedCode/converted.txt",
             testFiles=args.test_files,
-            input_dir_test=args.input_dir_test
+            input_dir_test=args.input_dir_test,
+            temp=float(args.temperature),
         )
 
     #e.g.
