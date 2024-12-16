@@ -10,6 +10,7 @@ import argparse
 def source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries, temp):
     run_no = 1
     os.makedirs(output_dir + f'/run_{run_no}/')
+    p1_success = False
     response_history = save_outputs(files, input_dir, output_dir+f'/run_{run_no}/', isPhase2=False, temp=temp)
     if num_of_retries > 0:
         errors = check_translation(execute_script_path, output_dir, run_no, response_history, error_path)
@@ -27,14 +28,16 @@ def source_code_translate(files, input_dir, output_dir, execute_script_path, err
 
         if not errors:
             print(f'Source code successfully translated after {run_no-1} feedback iterations.')
+            p1_success = True
         else:
             print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
-    return response_history, errors, run_no
+    return response_history, errors, run_no, p1_success
 
 #p2
 def source_test_translate(output_dir, error_path, testFiles, input_dir_test, history, files, run_no, num_of_retries, temp):
     test_run_no = 1
     os.makedirs(output_dir + f'/test_run_{test_run_no}')
+    success = False
     response_history = save_outputs(testFiles, input_dir_test, output_dir+f'/test_run_{test_run_no}',True, history, temp=temp)
     if num_of_retries > 0:
         errors = check_test(testFiles, output_dir, test_run_no, response_history, error_path)
@@ -61,10 +64,11 @@ def source_test_translate(output_dir, error_path, testFiles, input_dir_test, his
                     errors = mutation_test_errors
         if not errors:
             print(f'Test code successfully translated after {test_run_no-1} feedback iterations.')
+            success = True
         else:
             print(f'Max iteration count reached. Number of remaining errors in source code: {len(errors)}')
             # print("WOMP WOMP :(")
-    return response_history
+    return response_history, test_run_no, success
 
 #p2b
 def mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path):
@@ -114,19 +118,25 @@ def mutation_test(files, testFiles, output_dir, run_no, test_run_no, error_path)
 
 def llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test, testing_phase_2=True, num_of_retries=DEFAULT_NUM_RETRIES, temp = 0.2):
     print("**** STARTING PHASE 1: Source Code Translation ****")
+    output_dir = os.path.join(output_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     os.makedirs(output_dir)
-    response_history, errors, run_no = source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries, temp)
+    response_history, errors, run_no, p1_success = source_code_translate(files, input_dir, output_dir, execute_script_path, error_path, num_of_retries, temp)
     print("**** PHASE 1 COMPLETE ****")
     print("\n")
     print("**** STARTING PHASE 2: Source Test Translation ****")
     #if there are errors, we should only run the test generation once because the source code had issues
     if errors:
         num_of_retries = 0
-    response_history = source_test_translate(output_dir, error_path, testFiles, input_dir_test, response_history, files, run_no, num_of_retries, temp)
+    response_history, test_run_no, p2_success = source_test_translate(output_dir, error_path, testFiles, input_dir_test, response_history, files, run_no, num_of_retries, temp)
     print("**** PHASE 2 COMPLETE ****")
     print("\n")
-    print(f'Results saved in {output_dir}')
 
+    with open(output_dir + "results.txt", 'w') as output_file:
+        output_file.write(f'Number of phase 1 runs: {run_no}')
+        output_file.write(f'Phase 1 Succeeded or not?: {p1_success}')
+        output_file.write(f'Number of phase 2 runs: {test_run_no}')
+        output_file.write(f'Succeeded? or not: {p2_success}')
+    print(f'Results saved in {output_dir}')
     return response_history
 
 
@@ -134,6 +144,7 @@ def mixed_modality_translate(files, input_dir, output_dir, error_path, testFiles
     #called on sandbox = 1
     #a mix of phase 1 and phase 2
     #testing translated source code on ground truth proven translated tests
+    output_dir = os.path.join(output_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     os.makedirs(output_dir)
     print("**** STARTING MIXED MODALITY TRANSLATION ****")
     run_no = 1
@@ -179,7 +190,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 #
     if args.output_dir is None:
-        args.output_dir = os.path.join(os.getcwd(), 'translation/', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+        args.output_dir = os.path.join(os.getcwd(), 'translation/')
     if args.execute_script_path is None:
         args.execute_script_path = "translation/execute_java_kc_local.sh"
     if args.sandbox is None:
@@ -217,3 +228,6 @@ if __name__ == "__main__":
 
 #     llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test)
 #     mutation_test(args.files, args.test_files, args.output_dir, 3, 3, "ConvertedCode/converted.txt")
+
+
+# python3 translation/translate.py --files MathHandwritten --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files MathTest --input_dir_test LLM-Evaluation/src/test/java/ --temperature 0.2
