@@ -1,4 +1,4 @@
-# LLM-Evaluation with ANCHOR (Automated Novel Class-to-Class Object Refactoring)
+# LLM-Evaluation with ATLAS: Automated Translation for Language Adaption and Software
 
 ## Setup
 
