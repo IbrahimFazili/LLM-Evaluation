@@ -1,8 +1,6 @@
 # LLM-Evaluation with ANCHOR (Automated Novel Class-to-Class Object Refactoring)
 
-## Testing with Graalvm and Graalpy
-
-### Setting up the Graalvm and Graalpy
+## Setup
 
 This is is a slightly complicated procedure and easy to get wrong (especially in the graalpy) so try to follow it step by step.
 
@@ -54,9 +52,16 @@ Then you can run it like the following:
 
 `graalpy --jvm --vm.cp="/Users/ibrahimfazili/OneDrive - Cornell University/CS6158 Software Engineering in Machine Learning/LLM-Evaluation/LLM-Evaluation/src/main/" /Users/ibrahimfazili/OneDrive\ -\ Cornell\ University/CS6158\ Software\ Engineering\ in\ Machine\ Learning/LLM-Evaluation/LLM-Python-POC/test/TaskManagerTestJava.py`
 
-## Running POC
+## Running on POCs
 
-To run the POC you will need to modify the following lines in `translation/execute_java_kc_local.sh`
+Before running any POCs, make sure that you have a valid OPENAI_API_KEY
+To check if you have a key, in a terminal run `echo $OPENAI_API_KEY`, and to set it, run
+`export OPENAI_API_KEY=XXXX_XXX_XX_XXX` where XXXX_XXX_XX_XXX is a valid key.
+This command can be added to your bash startup script, so that it does not need to be repeated every time a new terminal is opened.
+Please see the OpenAI API for more details: https://openai.com/index/openai-api/.
+
+
+To run the POC you will need to modify the following lines in `translation/execute_java.sh`
 - Line 7 -> this should be the path to the GraalVM JDK you installed earlier
 - Line 10 -> this should be the absolute path to the `ConvertedCode/converted.txt` within the repository
 - Lines 12 onward -> this should just be a simple replacement of the users with your to point to the right `.m2` directory on Macs.
@@ -65,8 +70,13 @@ To run the POC you will need to modify the following lines in `translation/execu
 Then to run it (for Task + TaskManager) you can do the following
 `#python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/`
 
-To run Math, you will need to update the args to be `... --files Math .... --test_files MathTest`
+A full list of the command line arguments for running translation can be found using
+`python3 translation/translate.py --help`
 
+To run MathHandwritten, you will need to update the args to be `... --files MathHandwritten .... --test_files MathTest`
+
+The general translation flow for running the POCs follows the below format, with source code translation followed by source test translation.
+![system diagram](system%20diagram.png)
 ## Running on Apache Math
 
 Apache Math is not included by default in the repository as it would be too large. You will need to clone it from here `https://github.com/apache/commons-math.git` in the main directory of the repository.
@@ -75,4 +85,10 @@ To run,
 
 `python3 translation/translate.py --files AccurateMath AccurateMathCalc  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test ConvertedCode/ --sandbox 1`
 
-The rest TBD
+This will run the experimental "Phase 3" translation procedure for a small subset of classes in the Apache Commons math repository.
+Please note that since these files are significantly larger than the files in either of the two POCs, the system generation process is much slower, and you may run into rate usage limits.
+
+
+## Running temperature tests
+Running tests on temperature can be done by calling 
+`python3 run_tests.py` and the results will be saved in `experiments/`

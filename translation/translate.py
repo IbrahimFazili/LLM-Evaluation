@@ -192,11 +192,11 @@ if __name__ == "__main__":
     if args.output_dir is None:
         args.output_dir = os.path.join(os.getcwd(), 'translation/')
     if args.execute_script_path is None:
-        args.execute_script_path = "translation/execute_java_kc_local.sh"
+        args.execute_script_path = "translation/bash_scripts/execute_java.sh"
     if args.sandbox is None:
         args.sandbox = 0
     if args.temperature is None:
-            args.temperature = 0.2
+        args.temperature = 0.2
 
     if int(args.sandbox) == 1:
         mixed_modality_translate(
@@ -224,10 +224,4 @@ if __name__ == "__main__":
     #python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/
     #sandbox code:
     #python3 translation/translate.py --files AccurateMath AccurateMathCalc  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test ConvertedCode/ --sandbox 1
-
-
-#     llm_translate(files, input_dir, output_dir, execute_script_path, error_path, testFiles, input_dir_test)
-#     mutation_test(args.files, args.test_files, args.output_dir, 3, 3, "ConvertedCode/converted.txt")
-
-
 # python3 translation/translate.py --files MathHandwritten --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files MathTest --input_dir_test LLM-Evaluation/src/test/java/ --temperature 0.2

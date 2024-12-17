@@ -1,4 +1,4 @@
-class Math:
+class MathHandwritten:
 
     PRECISION = 1e-4
 
@@ -36,7 +36,7 @@ class Math:
             num1 = (1.0 / (2 * n + 1))
             num2 = (num - 1) / (num + 1)
 
-            sum += num1 * Math.pow(num2, 2 * n + 1)
+            sum += num1 * MathHandwritten.pow(num2, 2 * n + 1)
         return 2 * sum
 
     @staticmethod
@@ -50,8 +50,8 @@ class Math:
 
     @staticmethod
     def squareroot(num):
-        lo = Math.min(1, num)
-        hi = Math.max(1, num)
+        lo = MathHandwritten.min(1, num)
+        hi = MathHandwritten.max(1, num)
         mid = 0
 
         while 100 * lo * lo < num:
@@ -78,10 +78,8 @@ class Math:
 
     @staticmethod
     def toRadians(degrees):
-        return degrees * Math.PI / 180
+        return degrees * 3.141592653589793 / 180
 
     @staticmethod
     def toDegrees(radians):
-        return radians * 180 / Math.PI
-
-Math.PI = 3.141592653589793
+        return radians * 180 / 3.141592653589793
