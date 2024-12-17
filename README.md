@@ -69,8 +69,8 @@ To run the POC you will need to modify the following lines in `translation/bash_
 - Also make sure to chmod the file with `chmod +x translation/bash_scripts/execute_java.sh +x` or you will get permission errors
 
 
-Then to run it (for Task + TaskManager) you can do the following
-`#python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/`
+Then to run it (for Task + TaskManager) you can call the following in the base directory of this project
+`python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/`
 
 A full list of the command line arguments for running translation can be found using
 `python3 translation/translate.py --help`
@@ -85,7 +85,7 @@ Apache Math is not included by default in the repository as it would be too larg
 
 To run,
 
-`python3 translation/translate.py --files AccurateMath AccurateMathCalc  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test ConvertedCode/ --sandbox 1`
+`python3 translation/translate.py --files AccurateMath AccurateMathCalc  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test translation/apache-translations --sandbox 1`
 
 This will run the experimental "Phase 3" translation procedure for a small subset of classes in the Apache Commons math repository.
 Please note that since these files are significantly larger than the files in either of the two POCs, the system generation process is much slower, and you may run into rate usage limits.
