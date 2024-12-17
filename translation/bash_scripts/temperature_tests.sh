@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#this file must also be chmod'ed!
+
 python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --output_dir experiments/0_0 --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/ --temperature 0.0
 python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --output_dir experiments/0_1 --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/ --temperature 0.1
 python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --output_dir experiments/0_2 --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/ --temperature 0.2

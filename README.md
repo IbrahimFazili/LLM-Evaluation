@@ -61,11 +61,13 @@ This command can be added to your bash startup script, so that it does not need 
 Please see the OpenAI API for more details: https://openai.com/index/openai-api/.
 
 
-To run the POC you will need to modify the following lines in `translation/execute_java.sh`
+To run the POC you will need to modify the following lines in `translation/bash_scripts/execute_java.sh`
 - Line 7 -> this should be the path to the GraalVM JDK you installed earlier
-- Line 10 -> this should be the absolute path to the `ConvertedCode/converted.txt` within the repository
+- Line 10 -> this should be the absolute path to the `temp/errors.txt` within the repository
 - Lines 12 onward -> this should just be a simple replacement of the users with your to point to the right `.m2` directory on Macs.
 - Additional note: if you need to run the Math POC you will need to update Line 18 with 'MathTestPython'
+- Also make sure to chmod the file with `chmod +x translation/bash_scripts/execute_java.sh +x` or you will get permission errors
+
 
 Then to run it (for Task + TaskManager) you can do the following
 `#python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/`
@@ -92,3 +94,5 @@ Please note that since these files are significantly larger than the files in ei
 ## Running temperature tests
 Running tests on temperature can be done by calling 
 `python3 run_tests.py` and the results will be saved in `experiments/`
+
+Again make sure to `chmod +x translation/bash_scripts/temperature_tests.sh` before running.

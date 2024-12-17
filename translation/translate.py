@@ -203,7 +203,7 @@ if __name__ == "__main__":
             files=args.files,
             input_dir=args.input_dir,
             output_dir=args.output_dir,
-            error_path="ConvertedCode/converted.txt",
+            error_path="temp/errors.txt",
             testFiles=args.test_files,
             input_dir_test=args.input_dir_test,
             temp=float(args.temperature),
@@ -214,7 +214,7 @@ if __name__ == "__main__":
             input_dir=args.input_dir,
             output_dir=args.output_dir,
             execute_script_path=args.execute_script_path,
-            error_path="ConvertedCode/converted.txt",
+            error_path="temp/errors.txt",
             testFiles=args.test_files,
             input_dir_test=args.input_dir_test,
             temp=float(args.temperature),
@@ -223,5 +223,5 @@ if __name__ == "__main__":
     #e.g.
     #python3 translation/translate.py --files Task TaskManager --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files TaskManagerTest --input_dir_test LLM-Evaluation/src/test/java/
     #sandbox code:
-    #python3 translation/translate.py --files AccurateMath AccurateMathCalc  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test ConvertedCode/ --sandbox 1
+    #python3 translation/translate.py --files AccurateMath AccurateMathCalc  --input_dir commons-math/commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/ --test_files AccurateMathTest --input_dir_test translation/apache-translations/ --sandbox 1
 # python3 translation/translate.py --files MathHandwritten --input_dir LLM-Evaluation/src/main/org/cornell/ --test_files MathTest --input_dir_test LLM-Evaluation/src/test/java/ --temperature 0.2

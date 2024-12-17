@@ -24,9 +24,6 @@ class Task:
     def isCompleted(self):
         return self.completed
 
-    def setCompleted(self, completed):
-        self.completed = completed
-
 
 class TaskManager:
 
